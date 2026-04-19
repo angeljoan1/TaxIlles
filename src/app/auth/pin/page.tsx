@@ -49,13 +49,16 @@ function PinPageInner() {
     setError('')
 
     if (isUnlockMode) {
-      // Unlock existing session
       setLoading(true)
       try {
         const supabase = getSupabaseClient()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data } = await (supabase.from('user_config') as any).select('kdf_salt').single()
-        if (!data?.kdf_salt) { setError('Configuración no encontrada. Contacta soporte.'); setLoading(false); return }
+        if (!data?.kdf_salt) {
+          // No PIN set up yet — go to setup flow
+          router.replace('/auth/pin')
+          return
+        }
         await unlock(pin, data.kdf_salt)
         router.replace('/hoy')
       } catch {

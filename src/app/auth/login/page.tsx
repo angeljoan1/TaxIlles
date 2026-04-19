@@ -17,12 +17,22 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
+
     const { error } = await getSupabaseClient().auth.signInWithPassword({ email, password })
     if (error) {
       setError(error.message)
       setLoading(false)
-    } else {
+      return
+    }
+
+    // Check if user has already set up a PIN (user_config exists)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (getSupabaseClient().from('user_config') as any).select('kdf_salt').single()
+    if (data?.kdf_salt) {
       router.replace('/auth/pin?unlock=1')
+    } else {
+      // New user: no PIN set up yet → go to setup flow
+      router.replace('/auth/pin')
     }
   }
 
@@ -70,7 +80,7 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full bg-indigo-600 text-white rounded-xl py-3 font-semibold text-base disabled:opacity-60"
           >
-            {loading ? 'Entrando...' : 'Entrar'}
+            {loading ? 'Comprobando...' : 'Entrar'}
           </button>
         </form>
 
