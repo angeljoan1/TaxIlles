@@ -1,4 +1,4 @@
-import { format, startOfWeek, endOfWeek, subWeeks, addWeeks, parseISO } from 'date-fns'
+import { format, startOfWeek, endOfWeek, subWeeks, addWeeks, startOfMonth, endOfMonth, addMonths, parseISO } from 'date-fns'
 import { es } from 'date-fns/locale'
 
 export function todayISO(): string {
@@ -22,6 +22,18 @@ export function getWeekBounds(offset = 0): { start: string; end: string; label: 
   const start = startOfWeek(base, { weekStartsOn: 1 })
   const end = endOfWeek(base, { weekStartsOn: 1 })
   const label = offset === 0 ? 'Esta semana' : offset === -1 ? 'Semana pasada' : format(start, "'Semana del' d MMM", { locale: es })
+  return {
+    start: format(start, 'yyyy-MM-dd'),
+    end: format(end, 'yyyy-MM-dd'),
+    label,
+  }
+}
+
+export function getMonthBounds(offset = 0): { start: string; end: string; label: string } {
+  const base = addMonths(new Date(), offset)
+  const start = startOfMonth(base)
+  const end = endOfMonth(base)
+  const label = offset === 0 ? 'Este mes' : offset === -1 ? 'Mes pasado' : format(start, "MMM yyyy", { locale: es })
   return {
     start: format(start, 'yyyy-MM-dd'),
     end: format(end, 'yyyy-MM-dd'),

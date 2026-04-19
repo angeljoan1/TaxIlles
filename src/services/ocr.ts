@@ -34,7 +34,17 @@ function extractKilometers(text: string, previousReading?: number): OcrResult {
     const cleaned = m.replace(/[.,\s]/g, '')
     const num = parseInt(cleaned, 10)
     if (num >= 100 && num <= 9_999_999) {
-      candidates.push(num)
+      if (!candidates.includes(num)) candidates.push(num)
+    } else if (cleaned.length > 7) {
+      // OCR may concatenate digits — try all 5–7 digit windows
+      for (let len = 7; len >= 5; len--) {
+        for (let start = 0; start <= cleaned.length - len; start++) {
+          const sub = parseInt(cleaned.slice(start, start + len), 10)
+          if (sub >= 10_000 && sub <= 9_999_999 && !candidates.includes(sub)) {
+            candidates.push(sub)
+          }
+        }
+      }
     }
   }
 

@@ -10,8 +10,10 @@ import { getRidesToday, deleteRide } from '@/db/queries/rides'
 import { formatEuros } from '@/utils/currency'
 import { formatDateSpanish, todayISO } from '@/utils/date'
 import { type Ride } from '@/db/schema'
+import { useTranslations } from 'next-intl'
 
 export default function HoyPage() {
+  const t = useTranslations('hoy')
   const [rides, setRides] = useState<Ride[]>([])
   const [showAdd, setShowAdd] = useState(false)
 
@@ -38,7 +40,9 @@ export default function HoyPage() {
         <div className="flex items-end justify-between mt-2">
           <div>
             <p className="text-4xl font-bold">{formatEuros(totalCents)}</p>
-            <p className="text-indigo-200 text-sm mt-1">{rides.length} carrera{rides.length !== 1 ? 's' : ''} · media {formatEuros(avgCents)}</p>
+            <p className="text-indigo-200 text-sm mt-1">
+              {rides.length} {t('carreras')} · {t('media')} {formatEuros(avgCents)}
+            </p>
           </div>
           <button
             onClick={() => setShowAdd(true)}
@@ -57,13 +61,13 @@ export default function HoyPage() {
         {rides.length === 0 ? (
           <Card className="text-center py-10">
             <Car size={40} className="text-indigo-200 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">Sin carreras hoy</p>
-            <p className="text-gray-400 text-sm mt-1">Pulsa + para añadir la primera</p>
+            <p className="text-gray-500 font-medium">{t('sinCarreras')}</p>
+            <p className="text-gray-400 text-sm mt-1">{t('pulsaParaAnadir')}</p>
           </Card>
         ) : (
           <Card className="p-0 overflow-hidden">
             <div className="px-4 py-3 border-b border-gray-50">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Carreras de hoy</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{t('carrerasHoy')}</p>
             </div>
             {rides.map(ride => (
               <RideCard key={ride.id} ride={ride} onDelete={handleDelete} />

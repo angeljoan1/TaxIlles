@@ -75,3 +75,14 @@ export async function upsertUserConfig(userId: string, kdfSalt: string, language
   })
   if (error) throw error
 }
+
+export async function deleteAllUserData(): Promise<void> {
+  const supabase = getSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  const tables: TableName[] = ['rides', 'odometer_readings', 'shifts', 'expenses', 'destinations']
+  await Promise.all(tables.map(t =>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase.from(t) as any).delete().eq('user_id', user.id)
+  ))
+}

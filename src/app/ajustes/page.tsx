@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
-import { getActiveDestinations, addDestination, toggleDestination, updateDestination } from '@/db/queries/destinations'
+import { getActiveDestinations, addDestination, toggleDestination, updateDestination, deleteDestination } from '@/db/queries/destinations'
 import { getExpenses, addExpense, deleteExpense } from '@/db/queries/expenses'
 import { getOdometerReadings, deleteOdometerReading } from '@/db/queries/odometer'
 import { type Destination, type Expense, type OdometerReading, DESTINATION_COLORS, EXPENSE_CATEGORIES, db } from '@/db/schema'
@@ -15,12 +15,15 @@ import { useCrypto } from '@/context/CryptoContext'
 import { useAuth } from '@/context/AuthContext'
 import { getStoredLocale, setStoredLocale } from '@/i18n/provider'
 import { clearBiometricCredential, isPlatformAuthenticatorAvailable } from '@/lib/crypto/biometrics'
+import { deleteAllUserData } from '@/lib/supabase/queries'
+import { useTranslations } from 'next-intl'
 import {
   MapPin, DollarSign, Gauge, Download, Upload,
   Languages, Fingerprint, LogOut, Trash2, Plus, X,
 } from 'lucide-react'
 
 export default function AjustesPage() {
+  const t = useTranslations('ajustes')
   const { user, signOut } = useAuth()
   const { enrollBiometrics, hasBiometric, setBiometricState, canUseBiometrics } = useCrypto()
 
@@ -65,9 +68,16 @@ export default function AjustesPage() {
   }
 
   const handleDeleteAll = async () => {
-    if (!confirm('¿Borrar TODOS los datos? Esta acción no se puede deshacer.')) return
+    if (!confirm(t('confirmarBorrar'))) return
     if (!confirm('¿Seguro? Se perderán todas las carreras, gastos y km.')) return
-    await Promise.all([db.rides.clear(), db.odometer.clear(), db.expenses.clear(), db.shifts.clear()])
+    await Promise.all([
+      db.rides.clear(),
+      db.odometer.clear(),
+      db.expenses.clear(),
+      db.shifts.clear(),
+      db.destinations.clear(),
+      deleteAllUserData().catch(() => {}),
+    ])
     refresh()
   }
 
@@ -107,7 +117,7 @@ export default function AjustesPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="bg-indigo-600 text-white px-5 pt-12 pb-6">
-        <h1 className="text-xl font-bold">Ajustes</h1>
+        <h1 className="text-xl font-bold">{t('title')}</h1>
       </div>
 
       <div className="flex flex-col gap-4 p-4">
@@ -117,10 +127,10 @@ export default function AjustesPage() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <MapPin size={16} className="text-indigo-500" />
-              <p className="text-sm font-bold text-gray-800">Mis Destinos</p>
+              <p className="text-sm font-bold text-gray-800">{t('destinos')}</p>
             </div>
             <button onClick={() => { setEditDest(null); setShowAddDest(true) }} className="flex items-center gap-1 text-indigo-600 font-semibold text-sm">
-              <Plus size={14} /> Añadir
+              <Plus size={14} /> {t('nuevoDestino')}
             </button>
           </div>
           {destinations.length === 0 ? (
@@ -146,10 +156,10 @@ export default function AjustesPage() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <DollarSign size={16} className="text-indigo-500" />
-              <p className="text-sm font-bold text-gray-800">Gastos</p>
+              <p className="text-sm font-bold text-gray-800">{t('gastos')}</p>
             </div>
             <button onClick={() => setShowAddExpense(true)} className="flex items-center gap-1 text-indigo-600 font-semibold text-sm">
-              <Plus size={14} /> Añadir
+              <Plus size={14} /> {t('nuevoGasto')}
             </button>
           </div>
           {expenses.length === 0 ? (
@@ -178,7 +188,7 @@ export default function AjustesPage() {
         <Card>
           <div className="flex items-center gap-2 mb-3">
             <Gauge size={16} className="text-indigo-500" />
-            <p className="text-sm font-bold text-gray-800">Historial km</p>
+            <p className="text-sm font-bold text-gray-800">{t('historialKm')}</p>
           </div>
           {odometer.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-2">Sin lecturas de odómetro</p>
@@ -203,28 +213,28 @@ export default function AjustesPage() {
         <Card>
           <div className="flex items-center gap-2 mb-3">
             <Download size={16} className="text-indigo-500" />
-            <p className="text-sm font-bold text-gray-800">Exportar datos</p>
+            <p className="text-sm font-bold text-gray-800">{t('exportar')}</p>
           </div>
           <div className="flex flex-col gap-2">
             <div className="flex gap-2">
-              <Button variant="secondary" size="sm" className="flex-1" onClick={exportRidesCSV}>Carreras CSV</Button>
-              <Button variant="secondary" size="sm" className="flex-1" onClick={exportExpensesCSV}>Gastos CSV</Button>
+              <Button variant="secondary" size="sm" className="flex-1" onClick={exportRidesCSV}>{t('carrerasCSV')}</Button>
+              <Button variant="secondary" size="sm" className="flex-1" onClick={exportExpensesCSV}>{t('gastosCSV')}</Button>
             </div>
             <Button variant="secondary" size="sm" onClick={exportJSONBackup} className="w-full">
-              Backup JSON completo
+              {t('backupJSON')}
             </Button>
           </div>
 
           <div className="mt-4 flex items-center gap-2 mb-3">
             <Upload size={16} className="text-indigo-500" />
-            <p className="text-sm font-bold text-gray-800">Importar datos</p>
+            <p className="text-sm font-bold text-gray-800">{t('importar')}</p>
           </div>
           <div className="flex flex-col gap-2">
             <Button variant="secondary" size="sm" className="w-full" onClick={() => jsonInputRef.current?.click()}>
-              Restaurar backup JSON
+              {t('restaurarJSON')}
             </Button>
             <Button variant="secondary" size="sm" className="w-full" onClick={() => csvInputRef.current?.click()}>
-              Importar CSV carreras
+              {t('importarCSV')}
             </Button>
             <input ref={jsonInputRef} type="file" accept=".json" className="hidden" onChange={handleJSONImport} />
             <input ref={csvInputRef} type="file" accept=".csv" className="hidden" onChange={handleCSVImport} />
@@ -239,7 +249,7 @@ export default function AjustesPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Languages size={16} className="text-indigo-500" />
-              <p className="text-sm font-bold text-gray-800">Idioma</p>
+              <p className="text-sm font-bold text-gray-800">{t('idioma')}</p>
             </div>
             <button
               onClick={handleLocaleToggle}
@@ -257,8 +267,8 @@ export default function AjustesPage() {
               <div className="flex items-center gap-2">
                 <Fingerprint size={16} className="text-indigo-500" />
                 <div>
-                  <p className="text-sm font-bold text-gray-800">Biometría</p>
-                  <p className="text-xs text-gray-400">{hasBiometric ? 'Activada — huella / Face ID' : 'Desactivada'}</p>
+                  <p className="text-sm font-bold text-gray-800">{t('biometria')}</p>
+                  <p className="text-xs text-gray-400">{hasBiometric ? t('biometriaActiva') : t('biometriaInactiva')}</p>
                 </div>
               </div>
               <button
@@ -269,7 +279,7 @@ export default function AjustesPage() {
                     : 'bg-indigo-50 text-indigo-700'
                 }`}
               >
-                {hasBiometric ? 'Desactivar' : 'Activar'}
+                {hasBiometric ? t('desactivarBiometria') : t('activarBiometria')}
               </button>
             </div>
           </Card>
@@ -281,7 +291,7 @@ export default function AjustesPage() {
           className="flex items-center justify-center gap-2 w-full py-3 text-gray-500 text-sm font-medium"
         >
           <LogOut size={16} />
-          Cerrar sesión
+          {t('cerrarSesion')}
         </button>
 
         {/* Danger */}
@@ -290,7 +300,7 @@ export default function AjustesPage() {
           className="flex items-center justify-center gap-2 w-full py-3 text-red-500 text-sm font-medium"
         >
           <Trash2 size={16} />
-          Borrar todos los datos
+          {t('borrarDatos')}
         </button>
       </div>
 
@@ -325,6 +335,13 @@ function DestinationModal({ isOpen, existing, onClose, onSaved }: {
     onSaved(); onClose()
   }
 
+  const handleDelete = async () => {
+    if (!existing?.id) return
+    if (!confirm(`¿Eliminar permanentemente "${existing.name}"? No se puede deshacer.`)) return
+    await deleteDestination(existing.id)
+    onSaved(); onClose()
+  }
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={existing ? 'Editar destino' : 'Nuevo destino'}>
       <div className="flex flex-col gap-4 p-4">
@@ -346,7 +363,10 @@ function DestinationModal({ isOpen, existing, onClose, onSaved }: {
           {existing ? 'Guardar cambios' : 'Crear destino'}
         </Button>
         {existing && (
-          <Button variant="ghost" onClick={handleArchive} className="w-full text-red-400">Archivar destino</Button>
+          <>
+            <Button variant="ghost" onClick={handleArchive} className="w-full text-amber-500">Archivar destino</Button>
+            <Button variant="ghost" onClick={handleDelete} className="w-full text-red-500">Eliminar destino</Button>
+          </>
         )}
       </div>
     </Modal>

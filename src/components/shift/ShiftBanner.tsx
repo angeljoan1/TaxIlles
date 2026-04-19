@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Clock } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { OdometerModal } from '@/components/odometer/OdometerModal'
@@ -14,7 +14,10 @@ interface ShiftBannerProps {
 export function ShiftBanner({ onUpdate }: ShiftBannerProps) {
   const [shift, setShift] = useState<Shift | null>(null)
   const [tick, setTick] = useState(0)
+  const [showStartKm, setShowStartKm] = useState(false)
   const [showEndKm, setShowEndKm] = useState(false)
+  const startKmSavedRef = useRef(false)
+  const endKmSavedRef = useRef(false)
 
   const refresh = useCallback(async () => {
     const active = await getActiveShift()
@@ -29,28 +32,67 @@ export function ShiftBanner({ onUpdate }: ShiftBannerProps) {
     return () => clearInterval(id)
   }, [shift])
 
-  const handleStart = async () => {
-    await startShift()
-    await refresh()
-    onUpdate?.()
+  // --- START SHIFT FLOW ---
+  const handleStartClick = () => {
+    startKmSavedRef.current = false
+    setShowStartKm(true)
   }
 
-  const handleEndKmSaved = async () => {
+  const handleStartKmSaved = () => {
+    startKmSavedRef.current = true
+  }
+
+  const handleStartKmClose = async () => {
+    setShowStartKm(false)
+    const saved = startKmSavedRef.current
+    startKmSavedRef.current = false
+    if (saved || confirm('¿Empezar turno sin registrar km de inicio?')) {
+      await startShift()
+      await refresh()
+      onUpdate?.()
+    }
+  }
+
+  // --- END SHIFT FLOW ---
+  const handleEndClick = () => {
+    endKmSavedRef.current = false
+    setShowEndKm(true)
+  }
+
+  const handleEndKmSaved = () => {
+    endKmSavedRef.current = true
+  }
+
+  const handleEndKmClose = async () => {
+    setShowEndKm(false)
+    const saved = endKmSavedRef.current
+    endKmSavedRef.current = false
     if (!shift?.id) return
-    await endShift(shift.id)
-    await refresh()
-    onUpdate?.()
+    if (saved || confirm('¿Finalizar turno sin registrar km de fin?')) {
+      await endShift(shift.id)
+      await refresh()
+      onUpdate?.()
+    }
   }
 
   if (!shift) {
     return (
-      <button
-        onClick={handleStart}
-        className="w-full py-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 active:scale-95 transition-transform"
-      >
-        <Clock size={16} />
-        Iniciar turno
-      </button>
+      <>
+        <button
+          onClick={handleStartClick}
+          className="w-full py-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 active:scale-95 transition-transform"
+        >
+          <Clock size={16} />
+          Iniciar turno
+        </button>
+
+        <OdometerModal
+          isOpen={showStartKm}
+          defaultType="start"
+          onClose={handleStartKmClose}
+          onSaved={handleStartKmSaved}
+        />
+      </>
     )
   }
 
@@ -64,7 +106,7 @@ export function ShiftBanner({ onUpdate }: ShiftBannerProps) {
             <p className="text-xs text-amber-600">Inicio: {formatDateTime(shift.startAt)}</p>
           </div>
           <button
-            onClick={() => setShowEndKm(true)}
+            onClick={handleEndClick}
             className="px-4 py-2 bg-amber-500 text-white rounded-xl text-sm font-bold active:scale-95 transition-transform"
           >
             Finalizar
@@ -73,11 +115,10 @@ export function ShiftBanner({ onUpdate }: ShiftBannerProps) {
         <span className="sr-only">{tick}</span>
       </Card>
 
-      {/* Opens km modal with 'end' tab so driver records final odometer */}
       <OdometerModal
         isOpen={showEndKm}
         defaultType="end"
-        onClose={() => setShowEndKm(false)}
+        onClose={handleEndKmClose}
         onSaved={handleEndKmSaved}
       />
     </>

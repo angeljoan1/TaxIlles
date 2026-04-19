@@ -7,6 +7,7 @@ import { formatEuros } from '@/utils/currency'
 import { formatDateShort, todayISO } from '@/utils/date'
 import { type Ride } from '@/db/schema'
 import { format, subDays, startOfMonth, endOfMonth } from 'date-fns'
+import { useTranslations } from 'next-intl'
 
 type Filter = 'hoy' | 'semana' | 'mes'
 
@@ -18,6 +19,7 @@ function getRange(filter: Filter): { start: string; end: string } {
 }
 
 export default function ViajesPage() {
+  const t = useTranslations('viajes')
   const [filter, setFilter] = useState<Filter>('hoy')
   const [rides, setRides] = useState<Ride[]>([])
 
@@ -44,17 +46,17 @@ export default function ViajesPage() {
 
   const totalCents = rides.reduce((s, r) => s + r.priceCents, 0)
 
-  const filters: { id: Filter; label: string }[] = [
-    { id: 'hoy', label: 'Hoy' },
-    { id: 'semana', label: '7 días' },
-    { id: 'mes', label: 'Este mes' },
+  const filters: { id: Filter; labelKey: string }[] = [
+    { id: 'hoy', labelKey: 'hoy' },
+    { id: 'semana', labelKey: '7dias' },
+    { id: 'mes', labelKey: 'esteMes' },
   ]
 
   return (
     <div className="flex flex-col min-h-screen">
       <div className="bg-indigo-600 text-white px-5 pt-12 pb-6">
-        <h1 className="text-xl font-bold">Viajes</h1>
-        <p className="text-indigo-200 text-sm mt-1">{rides.length} carreras · {formatEuros(totalCents)}</p>
+        <h1 className="text-xl font-bold">{t('title')}</h1>
+        <p className="text-indigo-200 text-sm mt-1">{rides.length} {t('carreras')} · {formatEuros(totalCents)}</p>
       </div>
 
       <div className="p-4 flex flex-col gap-3">
@@ -66,7 +68,7 @@ export default function ViajesPage() {
               onClick={() => setFilter(f.id)}
               className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all ${filter === f.id ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'}`}
             >
-              {f.label}
+              {t(f.labelKey)}
             </button>
           ))}
         </div>
@@ -74,7 +76,7 @@ export default function ViajesPage() {
         {rides.length === 0 ? (
           <Card className="text-center py-10">
             <p className="text-4xl mb-3">🗂️</p>
-            <p className="text-gray-500 font-medium">Sin carreras en este período</p>
+            <p className="text-gray-500 font-medium">{t('sinViajes')}</p>
           </Card>
         ) : (
           Object.entries(grouped)
