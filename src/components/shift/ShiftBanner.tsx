@@ -1,6 +1,8 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { Clock } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
+import { OdometerModal } from '@/components/odometer/OdometerModal'
 import { getActiveShift, startShift, endShift } from '@/db/queries/shifts'
 import { type Shift } from '@/db/schema'
 import { formatDuration, formatDateTime } from '@/utils/date'
@@ -12,6 +14,7 @@ interface ShiftBannerProps {
 export function ShiftBanner({ onUpdate }: ShiftBannerProps) {
   const [shift, setShift] = useState<Shift | null>(null)
   const [tick, setTick] = useState(0)
+  const [showEndKm, setShowEndKm] = useState(false)
 
   const refresh = useCallback(async () => {
     const active = await getActiveShift()
@@ -20,7 +23,6 @@ export function ShiftBanner({ onUpdate }: ShiftBannerProps) {
 
   useEffect(() => { refresh() }, [refresh])
 
-  // Update duration every minute
   useEffect(() => {
     if (!shift) return
     const id = setInterval(() => setTick(t => t + 1), 60000)
@@ -33,7 +35,7 @@ export function ShiftBanner({ onUpdate }: ShiftBannerProps) {
     onUpdate?.()
   }
 
-  const handleEnd = async () => {
+  const handleEndKmSaved = async () => {
     if (!shift?.id) return
     await endShift(shift.id)
     await refresh()
@@ -46,27 +48,38 @@ export function ShiftBanner({ onUpdate }: ShiftBannerProps) {
         onClick={handleStart}
         className="w-full py-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 active:scale-95 transition-transform"
       >
-        🕐 Iniciar turno
+        <Clock size={16} />
+        Iniciar turno
       </button>
     )
   }
 
   return (
-    <Card className="bg-amber-50 border-amber-200">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs text-amber-600 font-semibold uppercase tracking-wide">Turno activo</p>
-          <p className="text-amber-900 font-bold text-lg">{formatDuration(shift.startAt)}</p>
-          <p className="text-xs text-amber-600">Inicio: {formatDateTime(shift.startAt)}</p>
+    <>
+      <Card className="bg-amber-50 border-amber-200">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs text-amber-600 font-semibold uppercase tracking-wide">Turno activo</p>
+            <p className="text-amber-900 font-bold text-lg">{formatDuration(shift.startAt)}</p>
+            <p className="text-xs text-amber-600">Inicio: {formatDateTime(shift.startAt)}</p>
+          </div>
+          <button
+            onClick={() => setShowEndKm(true)}
+            className="px-4 py-2 bg-amber-500 text-white rounded-xl text-sm font-bold active:scale-95 transition-transform"
+          >
+            Finalizar
+          </button>
         </div>
-        <button
-          onClick={handleEnd}
-          className="px-4 py-2 bg-amber-500 text-white rounded-xl text-sm font-bold active:scale-95 transition-transform"
-        >
-          Finalizar
-        </button>
-      </div>
-      <span className="sr-only">{tick}</span>
-    </Card>
+        <span className="sr-only">{tick}</span>
+      </Card>
+
+      {/* Opens km modal with 'end' tab so driver records final odometer */}
+      <OdometerModal
+        isOpen={showEndKm}
+        defaultType="end"
+        onClose={() => setShowEndKm(false)}
+        onSaved={handleEndKmSaved}
+      />
+    </>
   )
 }

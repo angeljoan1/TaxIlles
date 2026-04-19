@@ -3,6 +3,15 @@ import { db, type OdometerReading } from '../schema'
 const now = () => new Date().toISOString()
 
 export async function addOdometerReading(reading: Omit<OdometerReading, 'id' | 'updatedAt' | 'synced'>): Promise<number> {
+  // Overwrite existing reading of same type for today
+  if (reading.type === 'start' || reading.type === 'end') {
+    const today = new Date().toISOString().slice(0, 10)
+    const existing = await db.odometer
+      .where('readAt').between(today, today + 'T23:59:59', true, true)
+      .and(r => r.type === reading.type)
+      .toArray()
+    for (const r of existing) await db.odometer.delete(r.id!)
+  }
   return db.odometer.add({ ...reading, updatedAt: now(), synced: 0 })
 }
 

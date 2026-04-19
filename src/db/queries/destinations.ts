@@ -3,7 +3,8 @@ import { db, type Destination } from '../schema'
 const now = () => new Date().toISOString()
 
 export async function getActiveDestinations(): Promise<Destination[]> {
-  return db.destinations.where('isActive').equals(1).sortBy('name')
+  const all = await db.destinations.orderBy('name').toArray()
+  return all.filter(d => d.isActive)
 }
 
 export async function getAllDestinations(): Promise<Destination[]> {

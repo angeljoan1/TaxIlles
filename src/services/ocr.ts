@@ -8,29 +8,38 @@ export interface OcrResult {
 }
 
 export async function recognizeOdometerText(imageUri: string, previousReading?: number): Promise<OcrResult> {
-  // Dynamic import to avoid SSR issues
-  const Tesseract = (await import('tesseract.js')).default
-
-  const result = await Tesseract.recognize(imageUri, 'eng', {
+  const { createWorker } = await import('tesseract.js')
+  const worker = await createWorker('eng', 1, {
     logger: () => {},
+    errorHandler: () => {},
   })
-
-  const rawText = result.data.text
-  return extractKilometers(rawText, previousReading)
+  try {
+    await worker.setParameters({
+      tessedit_char_whitelist: '0123456789.',
+    })
+    const { data } = await worker.recognize(imageUri)
+    return extractKilometers(data.text, previousReading)
+  } finally {
+    await worker.terminate()
+  }
 }
 
 function extractKilometers(text: string, previousReading?: number): OcrResult {
-  // Matches formats: 143521, 143.521, 143,521, 143 521
-  const regex = /\b(\d{1,3}(?:[.,\s]?\d{3})*)\b/g
-  const matches = [...text.matchAll(regex)]
+  // Match sequences of digits (with optional separators: . , space)
+  const regex = /\d[\d.,\s]*/g
+  const matches = text.match(regex) ?? []
 
   const candidates: number[] = []
   for (const m of matches) {
-    const cleaned = m[1].replace(/[.,\s]/g, '')
+    const cleaned = m.replace(/[.,\s]/g, '')
     const num = parseInt(cleaned, 10)
-    if (num >= 1000 && num <= 9999999) {
+    if (num >= 100 && num <= 9_999_999) {
       candidates.push(num)
     }
+  }
+
+  if (candidates.length === 0) {
+    return { extractedKm: null, confidence: 'none', rawText: text, allCandidates: [] }
   }
 
   // Score: prefer 5-7 digit numbers (typical odometer), and > previous reading
@@ -40,8 +49,6 @@ function extractKilometers(text: string, previousReading?: number): OcrResult {
     if (previousReading && n > previousReading) score += 1
     return { n, score }
   }).sort((a, b) => b.score - a.score)
-
-  if (scored.length === 0) return { extractedKm: null, confidence: 'none', rawText: text, allCandidates: candidates }
 
   const best = scored[0]
   const confidence = best.score >= 3 ? 'high' : best.score === 2 ? 'medium' : 'low'
