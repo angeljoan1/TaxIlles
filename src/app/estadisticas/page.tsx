@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { BarChart2 } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { EarningsBarChart } from '@/components/stats/EarningsBarChart'
 import { TopDestinations } from '@/components/stats/TopDestinations'
@@ -105,7 +106,7 @@ export default function EstadisticasPage() {
 
         {chartData.length === 0 && topEarnings.length === 0 && (
           <Card className="text-center py-10">
-            <p className="text-4xl mb-3">📊</p>
+            <BarChart2 size={40} className="text-indigo-200 mx-auto mb-3" />
             <p className="text-gray-500 font-medium">Sin datos esta semana</p>
             <p className="text-gray-400 text-sm mt-1">Añade carreras para ver estadísticas</p>
           </Card>

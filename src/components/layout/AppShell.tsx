@@ -6,8 +6,14 @@ import { AuthProvider, useAuth } from '@/context/AuthContext'
 import { CryptoProvider, useCrypto } from '@/context/CryptoContext'
 import { I18nProvider } from '@/i18n/provider'
 import { BottomNav } from './BottomNav'
+import { useSync } from '@/hooks/useSync'
 
 const AUTH_ROUTES = ['/auth/login', '/auth/register', '/auth/pin']
+
+function SyncRunner() {
+  useSync()
+  return null
+}
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -32,17 +38,13 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     )
   }
 
-  // Locked: redirect to PIN unlock (only for authenticated users on non-auth routes)
   if (user && !isUnlocked && !isAuthRoute) {
-    return (
-      <div className="max-w-lg mx-auto min-h-screen">
-        <PinUnlockScreen />
-      </div>
-    )
+    return <PinUnlockScreen />
   }
 
   return (
     <>
+      {user && isUnlocked && <SyncRunner />}
       <main className="max-w-lg mx-auto pb-20 min-h-screen">
         {children}
       </main>
@@ -53,9 +55,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
 function PinUnlockScreen() {
   const router = useRouter()
-  useEffect(() => {
-    router.replace('/auth/pin?unlock=1')
-  }, [router])
+  useEffect(() => { router.replace('/auth/pin?unlock=1') }, [router])
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
@@ -74,3 +74,4 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     </AuthProvider>
   )
 }
+

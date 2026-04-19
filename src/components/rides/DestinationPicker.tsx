@@ -1,4 +1,5 @@
 'use client'
+import { MapPin } from 'lucide-react'
 import { type Destination } from '@/db/schema'
 
 interface DestinationPickerProps {
@@ -11,7 +12,7 @@ export function DestinationPicker({ destinations, selectedId, onSelect }: Destin
   if (destinations.length === 0) {
     return (
       <div className="text-center py-8 text-gray-400">
-        <p className="text-4xl mb-2">📍</p>
+        <MapPin size={36} className="text-indigo-200 mx-auto mb-2" />
         <p className="text-sm">Añade destinos en Ajustes primero</p>
       </div>
     )

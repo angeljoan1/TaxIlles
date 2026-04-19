@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { Plus, Car } from 'lucide-react'
 import { AddRideModal } from '@/components/rides/AddRideModal'
 import { RideCard } from '@/components/rides/RideCard'
 import { OdometerSection } from '@/components/odometer/OdometerSection'
@@ -41,9 +42,9 @@ export default function HoyPage() {
           </div>
           <button
             onClick={() => setShowAdd(true)}
-            className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-indigo-600 text-3xl font-bold shadow-lg active:scale-95 transition-transform"
+            className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-indigo-600 shadow-lg active:scale-95 transition-transform"
           >
-            +
+            <Plus size={28} />
           </button>
         </div>
       </div>
@@ -55,7 +56,7 @@ export default function HoyPage() {
         {/* Ride list */}
         {rides.length === 0 ? (
           <Card className="text-center py-10">
-            <p className="text-4xl mb-3">🚕</p>
+            <Car size={40} className="text-indigo-200 mx-auto mb-3" />
             <p className="text-gray-500 font-medium">Sin carreras hoy</p>
             <p className="text-gray-400 text-sm mt-1">Pulsa + para añadir la primera</p>
           </Card>
