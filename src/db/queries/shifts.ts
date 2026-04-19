@@ -1,11 +1,13 @@
 import { db, type Shift } from '../schema'
 
+const now = () => new Date().toISOString()
+
 export async function startShift(startKm?: number): Promise<number> {
-  return db.shifts.add({ startAt: new Date().toISOString(), startKm })
+  return db.shifts.add({ startAt: now(), startKm, updatedAt: now(), synced: 0 })
 }
 
 export async function endShift(id: number, endKm?: number): Promise<void> {
-  await db.shifts.update(id, { endAt: new Date().toISOString(), endKm })
+  await db.shifts.update(id, { endAt: now(), endKm, updatedAt: now(), synced: 0 })
 }
 
 export async function getActiveShift(): Promise<Shift | undefined> {

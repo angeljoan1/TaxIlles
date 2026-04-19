@@ -1,7 +1,9 @@
 import { db, type Expense } from '../schema'
 
-export async function addExpense(expense: Omit<Expense, 'id'>): Promise<number> {
-  return db.expenses.add(expense)
+const now = () => new Date().toISOString()
+
+export async function addExpense(expense: Omit<Expense, 'id' | 'updatedAt' | 'synced'>): Promise<number> {
+  return db.expenses.add({ ...expense, updatedAt: now(), synced: 0 })
 }
 
 export async function getExpenses(limit = 50): Promise<Expense[]> {

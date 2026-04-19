@@ -1,0 +1,98 @@
+{
+  "nav": {
+    "hoy": "Hoy",
+    "viajes": "Viajes",
+    "stats": "Stats",
+    "ajustes": "Ajustes"
+  },
+  "hoy": {
+    "title": "Hoy",
+    "sinCarreras": "Sin carreras hoy",
+    "nuevaCarrera": "Nueva carrera",
+    "totalHoy": "Total hoy",
+    "carreras": "carreras",
+    "media": "media",
+    "turnoActivo": "Turno activo",
+    "iniciarTurno": "Iniciar turno",
+    "finalizarTurno": "Finalizar turno",
+    "horasActivo": "Horas activo"
+  },
+  "addRide": {
+    "title": "Nueva carrera",
+    "destino": "Destino",
+    "precio": "Precio",
+    "guardar": "Guardar",
+    "cancelar": "Cancelar",
+    "sinDestinos": "Sin destinos. Crea uno en Ajustes.",
+    "precioRequerido": "Introduce un precio"
+  },
+  "viajes": {
+    "title": "Viajes",
+    "hoy": "Hoy",
+    "estaSemana": "Esta semana",
+    "esteMes": "Este mes",
+    "total": "Total",
+    "sinViajes": "Sin viajes en este período",
+    "eliminar": "Eliminar"
+  },
+  "estadisticas": {
+    "title": "Estadísticas",
+    "ingresosSemana": "Ingresos esta semana",
+    "topDestinos": "Top destinos",
+    "kmRatio": "Ratio €/km",
+    "semanaAnterior": "vs semana anterior",
+    "masRentable": "Más rentable",
+    "masFrecuente": "Más frecuente"
+  },
+  "ajustes": {
+    "title": "Ajustes",
+    "destinos": "Mis destinos",
+    "nuevoDestino": "Nuevo destino",
+    "gastos": "Gastos",
+    "nuevoGasto": "Nuevo gasto",
+    "odometro": "Odómetro",
+    "datos": "Datos",
+    "exportarCSV": "Exportar CSV",
+    "exportarJSON": "Exportar backup JSON",
+    "importarJSON": "Restaurar backup JSON",
+    "importarCSV": "Importar CSV carreras",
+    "idioma": "Idioma",
+    "biometria": "Biometría",
+    "activarBiometria": "Activar huella / Face ID",
+    "desactivarBiometria": "Desactivar biometría",
+    "cerrarSesion": "Cerrar sesión",
+    "borrarDatos": "Borrar todos los datos",
+    "confirmarBorrar": "¿Borrar todos los datos? Esta acción no se puede deshacer."
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "registro": "Crear cuenta",
+    "email": "Email",
+    "password": "Contraseña",
+    "entrar": "Entrar",
+    "crearCuenta": "Crear cuenta",
+    "yaTienesCuenta": "¿Ya tienes cuenta?",
+    "noTienesCuenta": "¿No tienes cuenta?",
+    "verificaEmail": "Revisa tu email para confirmar la cuenta",
+    "pin": "PIN de acceso",
+    "pinDesc": "Crea un PIN de 4-8 dígitos. Lo necesitarás para acceder a tus datos.",
+    "confirmarPin": "Confirmar PIN",
+    "pinNoCoincide": "Los PINs no coinciden",
+    "pinMuyCorto": "El PIN debe tener al menos 4 dígitos",
+    "guardarPin": "Guardar PIN",
+    "desbloquear": "Desbloquear",
+    "usarBiometria": "Usar huella / Face ID",
+    "olvidePIN": "Olvidé mi PIN"
+  },
+  "common": {
+    "guardar": "Guardar",
+    "cancelar": "Cancelar",
+    "eliminar": "Eliminar",
+    "editar": "Editar",
+    "cerrar": "Cerrar",
+    "cargando": "Cargando...",
+    "error": "Error",
+    "exito": "¡Hecho!",
+    "confirmar": "Confirmar"
+  }
+}

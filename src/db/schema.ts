@@ -6,6 +6,9 @@ export interface Destination {
   color: string
   isActive: boolean
   createdAt: string
+  updatedAt: string
+  supabaseId?: string
+  synced: number // 0=pending, 1=synced
 }
 
 export interface Ride {
@@ -17,6 +20,9 @@ export interface Ride {
   riddenAt: string
   kmGps?: number
   notes?: string
+  updatedAt: string
+  supabaseId?: string
+  synced: number
 }
 
 export interface OdometerReading {
@@ -27,6 +33,9 @@ export interface OdometerReading {
   photoUri?: string
   readAt: string
   notes?: string
+  updatedAt: string
+  supabaseId?: string
+  synced: number
 }
 
 export interface Shift {
@@ -35,6 +44,9 @@ export interface Shift {
   endAt?: string
   startKm?: number
   endKm?: number
+  updatedAt: string
+  supabaseId?: string
+  synced: number
 }
 
 export interface Expense {
@@ -43,6 +55,9 @@ export interface Expense {
   category: 'gasolina' | 'itv' | 'mantenimiento' | 'seguro' | 'otro'
   description?: string
   date: string
+  updatedAt: string
+  supabaseId?: string
+  synced: number
 }
 
 class TaxIllesDB extends Dexie {
@@ -54,12 +69,29 @@ class TaxIllesDB extends Dexie {
 
   constructor() {
     super('taxilles')
+    // v1: original schema
     this.version(1).stores({
       destinations: '++id, name, isActive, createdAt',
       rides: '++id, destinationId, riddenAt, [riddenAt+destinationId]',
       odometer: '++id, readAt, type',
       shifts: '++id, startAt, endAt',
       expenses: '++id, date, category',
+    })
+    // v2: add sync fields (upgrade fills defaults)
+    this.version(2).stores({
+      destinations: '++id, name, isActive, createdAt, supabaseId, synced',
+      rides: '++id, destinationId, riddenAt, [riddenAt+destinationId], supabaseId, synced',
+      odometer: '++id, readAt, type, supabaseId, synced',
+      shifts: '++id, startAt, endAt, supabaseId, synced',
+      expenses: '++id, date, category, supabaseId, synced',
+    }).upgrade(tx => {
+      const now = new Date().toISOString()
+      const fill = (table: string) =>
+        tx.table(table).toCollection().modify((rec: Record<string, unknown>) => {
+          if (!rec.updatedAt) rec.updatedAt = rec.createdAt ?? now
+          if (rec.synced === undefined) rec.synced = 0
+        })
+      return Promise.all(['destinations', 'rides', 'odometer', 'shifts', 'expenses'].map(fill))
     })
   }
 }

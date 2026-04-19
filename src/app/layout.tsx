@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist } from 'next/font/google'
 import './globals.css'
-import { BottomNav } from '@/components/layout/BottomNav'
+import { AppShell } from '@/components/layout/AppShell'
 
 const geist = Geist({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'TaxIlles',
-  description: 'Gestión de carreras para taxistas',
+  description: 'Gestió de carreres per a taxistes',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -32,10 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
       <body className={`${geist.className} bg-gray-50 min-h-screen`}>
-        <main className="max-w-lg mx-auto pb-20 min-h-screen">
-          {children}
-        </main>
-        <BottomNav />
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   )

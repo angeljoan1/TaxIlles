@@ -1,7 +1,9 @@
 import { db, type Ride } from '../schema'
 
-export async function addRide(ride: Omit<Ride, 'id'>): Promise<number> {
-  return db.rides.add(ride)
+const now = () => new Date().toISOString()
+
+export async function addRide(ride: Omit<Ride, 'id' | 'updatedAt' | 'synced'>): Promise<number> {
+  return db.rides.add({ ...ride, updatedAt: now(), synced: 0 })
 }
 
 export async function getRidesToday(): Promise<Ride[]> {

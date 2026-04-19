@@ -1,0 +1,98 @@
+{
+  "nav": {
+    "hoy": "Avui",
+    "viajes": "Viatges",
+    "stats": "Stats",
+    "ajustes": "Ajustes"
+  },
+  "hoy": {
+    "title": "Avui",
+    "sinCarreras": "Sense curses avui",
+    "nuevaCarrera": "Nova cursa",
+    "totalHoy": "Total avui",
+    "carreras": "curses",
+    "media": "mitjana",
+    "turnoActivo": "Torn actiu",
+    "iniciarTurno": "Iniciar torn",
+    "finalizarTurno": "Finalitzar torn",
+    "horasActivo": "Hores actiu"
+  },
+  "addRide": {
+    "title": "Nova cursa",
+    "destino": "Destí",
+    "precio": "Preu",
+    "guardar": "Guardar",
+    "cancelar": "Cancel·lar",
+    "sinDestinos": "Sense destins. Crea'n un a Ajustes.",
+    "precioRequerido": "Introdueix un preu"
+  },
+  "viajes": {
+    "title": "Viatges",
+    "hoy": "Avui",
+    "estaSemana": "Aquesta setmana",
+    "esteMes": "Aquest mes",
+    "total": "Total",
+    "sinViajes": "Sense viatges en aquest període",
+    "eliminar": "Eliminar"
+  },
+  "estadisticas": {
+    "title": "Estadístiques",
+    "ingresosSemana": "Ingressos aquesta setmana",
+    "topDestinos": "Top destins",
+    "kmRatio": "Ràtio €/km",
+    "semanaAnterior": "vs setmana anterior",
+    "masRentable": "Més rendible",
+    "masFrecuente": "Més freqüent"
+  },
+  "ajustes": {
+    "title": "Ajustes",
+    "destinos": "Els meus destins",
+    "nuevoDestino": "Nou destí",
+    "gastos": "Despeses",
+    "nuevoGasto": "Nova despesa",
+    "odometro": "Odòmetre",
+    "datos": "Dades",
+    "exportarCSV": "Exportar CSV",
+    "exportarJSON": "Exportar backup JSON",
+    "importarJSON": "Restaurar backup JSON",
+    "importarCSV": "Importar CSV curses",
+    "idioma": "Idioma",
+    "biometria": "Biometria",
+    "activarBiometria": "Activar empremta / Face ID",
+    "desactivarBiometria": "Desactivar biometria",
+    "cerrarSesion": "Tancar sessió",
+    "borrarDatos": "Esborrar totes les dades",
+    "confirmarBorrar": "Esborrar totes les dades? Aquesta acció no es pot desfer."
+  },
+  "auth": {
+    "login": "Iniciar sessió",
+    "registro": "Crear compte",
+    "email": "Email",
+    "password": "Contrasenya",
+    "entrar": "Entrar",
+    "crearCuenta": "Crear compte",
+    "yaTienesCuenta": "Ja tens compte?",
+    "noTienesCuenta": "No tens compte?",
+    "verificaEmail": "Revisa el teu email per confirmar el compte",
+    "pin": "PIN d'accés",
+    "pinDesc": "Crea un PIN de 4-8 dígits. El necessitaràs per accedir a les teves dades.",
+    "confirmarPin": "Confirmar PIN",
+    "pinNoCoincide": "Els PINs no coincideixen",
+    "pinMuyCorto": "El PIN ha de tenir almenys 4 dígits",
+    "guardarPin": "Guardar PIN",
+    "desbloquear": "Desbloquejar",
+    "usarBiometria": "Usar empremta / Face ID",
+    "olvidePIN": "He oblidat el meu PIN"
+  },
+  "common": {
+    "guardar": "Guardar",
+    "cancelar": "Cancel·lar",
+    "eliminar": "Eliminar",
+    "editar": "Editar",
+    "cerrar": "Tancar",
+    "cargando": "Carregant...",
+    "error": "Error",
+    "exito": "Fet!",
+    "confirmar": "Confirmar"
+  }
+}

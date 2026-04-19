@@ -15,7 +15,7 @@ export async function exportRidesCSV(): Promise<void> {
       r.kmGps ?? '',
     ].join(',')
   })
-  downloadCSV('carreras.csv', header + rows.join('\n'))
+  downloadBlob('carreras.csv', '\uFEFF' + header + rows.join('\n'), 'text/csv;charset=utf-8;')
 }
 
 export async function exportExpensesCSV(): Promise<void> {
@@ -27,11 +27,32 @@ export async function exportExpensesCSV(): Promise<void> {
     `"${e.description ?? ''}"`,
     (e.amountCents / 100).toFixed(2),
   ].join(','))
-  downloadCSV('gastos.csv', header + rows.join('\n'))
+  downloadBlob('gastos.csv', '\uFEFF' + header + rows.join('\n'), 'text/csv;charset=utf-8;')
 }
 
-function downloadCSV(filename: string, content: string): void {
-  const blob = new Blob(['\uFEFF' + content], { type: 'text/csv;charset=utf-8;' })
+export async function exportJSONBackup(): Promise<void> {
+  const [destinations, rides, odometer, shifts, expenses] = await Promise.all([
+    db.destinations.toArray(),
+    db.rides.orderBy('riddenAt').toArray(),
+    db.odometer.orderBy('readAt').toArray(),
+    db.shifts.orderBy('startAt').toArray(),
+    db.expenses.orderBy('date').toArray(),
+  ])
+  const backup = {
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    destinations,
+    rides,
+    odometer,
+    shifts,
+    expenses,
+  }
+  const date = format(new Date(), 'yyyy-MM-dd')
+  downloadBlob(`taxilles-backup-${date}.json`, JSON.stringify(backup, null, 2), 'application/json')
+}
+
+function downloadBlob(filename: string, content: string, type: string): void {
+  const blob = new Blob([content], { type })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url

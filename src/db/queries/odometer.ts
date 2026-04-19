@@ -1,7 +1,9 @@
 import { db, type OdometerReading } from '../schema'
 
-export async function addOdometerReading(reading: Omit<OdometerReading, 'id'>): Promise<number> {
-  return db.odometer.add(reading)
+const now = () => new Date().toISOString()
+
+export async function addOdometerReading(reading: Omit<OdometerReading, 'id' | 'updatedAt' | 'synced'>): Promise<number> {
+  return db.odometer.add({ ...reading, updatedAt: now(), synced: 0 })
 }
 
 export async function getOdometerReadings(limit = 20): Promise<OdometerReading[]> {

@@ -1,5 +1,7 @@
 import { db, type Destination } from '../schema'
 
+const now = () => new Date().toISOString()
+
 export async function getActiveDestinations(): Promise<Destination[]> {
   return db.destinations.where('isActive').equals(1).sortBy('name')
 }
@@ -9,15 +11,15 @@ export async function getAllDestinations(): Promise<Destination[]> {
 }
 
 export async function addDestination(name: string, color: string): Promise<number> {
-  return db.destinations.add({ name: name.trim(), color, isActive: true, createdAt: new Date().toISOString() })
+  return db.destinations.add({ name: name.trim(), color, isActive: true, createdAt: now(), updatedAt: now(), synced: 0 })
 }
 
 export async function updateDestination(id: number, data: Partial<Destination>): Promise<void> {
-  await db.destinations.update(id, data)
+  await db.destinations.update(id, { ...data, updatedAt: now(), synced: 0 })
 }
 
 export async function toggleDestination(id: number, isActive: boolean): Promise<void> {
-  await db.destinations.update(id, { isActive })
+  await db.destinations.update(id, { isActive, updatedAt: now(), synced: 0 })
 }
 
 export async function deleteDestination(id: number): Promise<void> {
