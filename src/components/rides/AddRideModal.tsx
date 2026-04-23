@@ -30,7 +30,6 @@ export function AddRideModal({ isOpen, onClose, onSaved }: AddRideModalProps) {
       setSelectedId(null)
       setPriceCents('')
     } else {
-      // Clean up GPS when modal closes
       stopGpsRef.current?.()
       stopGpsRef.current = null
       setGpsEnabled(false)
@@ -79,37 +78,44 @@ export function AddRideModal({ isOpen, onClose, onSaved }: AddRideModalProps) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Nueva Carrera">
-      <div className="flex flex-col gap-1">
-        <p className="px-4 pt-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Destino</p>
+    <Modal isOpen={isOpen} onClose={onClose} title="Nova cursa">
+      <div className="flex flex-col gap-1 pb-2">
+        <p
+          className="px-4 pt-3 text-xs font-bold uppercase tracking-widest"
+          style={{ color: 'var(--foreground)', opacity: 0.4 }}
+        >
+          Destí
+        </p>
         <DestinationPicker destinations={destinations} selectedId={selectedId} onSelect={setSelectedId} />
-        <p className="px-4 pt-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">Precio</p>
+
         <NumberKeypad value={priceCents} onChange={setPriceCents} />
 
-        {/* GPS km tracking */}
+        {/* GPS toggle */}
         <div className="px-4 pb-1">
           <button
             onClick={handleToggleGps}
-            className={`w-full py-2 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all active:scale-95 ${
+            className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all active:scale-95"
+            style={
               gpsEnabled
-                ? 'bg-emerald-100 text-emerald-700'
-                : 'bg-gray-100 text-gray-500'
-            }`}
+                ? { background: 'rgba(16,185,129,0.12)', color: 'var(--emerald)' }
+                : { background: 'var(--surface2)', color: 'var(--foreground)', opacity: 0.6 }
+            }
           >
             <Navigation size={15} />
             {gpsEnabled
-              ? `GPS activo${gpsKm !== null ? ` · ${gpsKm} km` : ' · calculando...'}`
-              : 'Activar GPS (consume batería)'}
+              ? `GPS actiu${gpsKm !== null ? ` · ${gpsKm} km` : ' · calculant...'}`
+              : 'Activar GPS (consumeix bateria)'}
           </button>
         </div>
 
-        <div className="px-4 pb-4 pt-2">
+        <div className="px-4 pt-1 pb-4">
           <button
             onClick={handleSave}
             disabled={!canSave}
-            className="w-full py-4 bg-emerald-500 text-white text-lg font-bold rounded-2xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full py-4 text-white text-base font-extrabold rounded-2xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ background: 'var(--emerald)' }}
           >
-            Guardar Carrera
+            Guardar cursa
           </button>
         </div>
       </div>
