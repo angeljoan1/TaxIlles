@@ -19,13 +19,15 @@ import { deleteAllUserData } from '@/lib/supabase/queries'
 import { useTranslations } from 'next-intl'
 import {
   MapPin, DollarSign, Gauge, Download, Upload,
-  Languages, Fingerprint, LogOut, Trash2, Plus, X,
+  Languages, Fingerprint, LogOut, Trash2, Plus, X, Sun, Moon,
 } from 'lucide-react'
+import { useTheme } from '@/hooks/useTheme'
 
 export default function AjustesPage() {
   const t = useTranslations('ajustes')
   const { user, signOut } = useAuth()
   const { enrollBiometrics, hasBiometric, setBiometricState, canUseBiometrics } = useCrypto()
+  const { theme, toggle: toggleTheme } = useTheme()
 
   const [destinations, setDestinations] = useState<Destination[]>([])
   const [expenses, setExpenses] = useState<Expense[]>([])
@@ -116,8 +118,17 @@ export default function AjustesPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="bg-indigo-600 text-white px-5 pt-12 pb-6">
-        <h1 className="text-xl font-bold">{t('title')}</h1>
+      <div className="text-white px-5 pt-12 pb-6" style={{ background: 'var(--indigo)' }}>
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold">{t('title')}</h1>
+          <button
+            onClick={toggleTheme}
+            className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center active:scale-95 transition-transform"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-4 p-4">

@@ -1,10 +1,10 @@
 'use client'
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { Clock } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card } from '@/components/ui/Card'
 import { OdometerModal } from '@/components/odometer/OdometerModal'
 import { getActiveShift, startShift, endShift } from '@/db/queries/shifts'
-import { type Shift } from '@/db/schema'
+import { getTodayOdometer } from '@/db/queries/odometer'
+import { type Shift, type OdometerReading } from '@/db/schema'
 import { formatDuration, formatDateTime } from '@/utils/date'
 
 interface ShiftBannerProps {
@@ -16,12 +16,14 @@ export function ShiftBanner({ onUpdate }: ShiftBannerProps) {
   const [tick, setTick] = useState(0)
   const [showStartKm, setShowStartKm] = useState(false)
   const [showEndKm, setShowEndKm] = useState(false)
-  const startKmSavedRef = useRef(false)
-  const endKmSavedRef = useRef(false)
+  const [showAddKm, setShowAddKm] = useState(false)
+  const [kmType, setKmType] = useState<'start' | 'end'>('start')
+  const [kmData, setKmData] = useState<{ start?: OdometerReading; end?: OdometerReading }>({})
 
   const refresh = useCallback(async () => {
-    const active = await getActiveShift()
+    const [active, km] = await Promise.all([getActiveShift(), getTodayOdometer()])
     setShift(active ?? null)
+    setKmData(km)
   }, [])
 
   useEffect(() => { refresh() }, [refresh])
@@ -32,94 +34,150 @@ export function ShiftBanner({ onUpdate }: ShiftBannerProps) {
     return () => clearInterval(id)
   }, [shift])
 
-  // --- START SHIFT FLOW ---
-  const handleStartClick = () => {
-    startKmSavedRef.current = false
-    setShowStartKm(true)
-  }
+  // ── Start shift ──────────────────────────────────────────
+  const doStartShift = useCallback(async () => {
+    await startShift()
+    await refresh()
+    onUpdate?.()
+  }, [refresh, onUpdate])
 
-  const handleStartKmSaved = () => {
-    startKmSavedRef.current = true
-  }
-
-  const handleStartKmClose = async () => {
+  const handleStartKmSaved = useCallback(async () => {
     setShowStartKm(false)
-    const saved = startKmSavedRef.current
-    startKmSavedRef.current = false
-    if (saved || confirm('¿Empezar turno sin registrar km de inicio?')) {
-      await startShift()
-      await refresh()
-      onUpdate?.()
-    }
-  }
+    await doStartShift()
+  }, [doStartShift])
 
-  // --- END SHIFT FLOW ---
-  const handleEndClick = () => {
-    endKmSavedRef.current = false
-    setShowEndKm(true)
-  }
+  const handleStartKmSkip = useCallback(async () => {
+    setShowStartKm(false)
+    await doStartShift()
+  }, [doStartShift])
 
-  const handleEndKmSaved = () => {
-    endKmSavedRef.current = true
-  }
-
-  const handleEndKmClose = async () => {
-    setShowEndKm(false)
-    const saved = endKmSavedRef.current
-    endKmSavedRef.current = false
+  // ── End shift ────────────────────────────────────────────
+  const doEndShift = useCallback(async () => {
     if (!shift?.id) return
-    if (saved || confirm('¿Finalizar turno sin registrar km de fin?')) {
-      await endShift(shift.id)
-      await refresh()
-      onUpdate?.()
-    }
+    await endShift(shift.id)
+    await refresh()
+    onUpdate?.()
+  }, [shift, refresh, onUpdate])
+
+  const handleEndKmSaved = useCallback(async () => {
+    setShowEndKm(false)
+    await doEndShift()
+  }, [doEndShift])
+
+  const handleEndKmSkip = useCallback(async () => {
+    setShowEndKm(false)
+    await doEndShift()
+  }, [doEndShift])
+
+  // ── Open km editor for active shift ──────────────────────
+  const openKmModal = (type: 'start' | 'end') => {
+    setKmType(type)
+    setShowAddKm(true)
   }
 
+  // ── No active shift ───────────────────────────────────────
   if (!shift) {
     return (
       <>
         <button
-          onClick={handleStartClick}
-          className="w-full py-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 active:scale-95 transition-transform"
+          onClick={() => setShowStartKm(true)}
+          className="w-full rounded-2xl border border-amber-200 active:scale-95 transition-transform"
+          style={{ background: 'rgba(245,166,35,0.08)' }}
         >
-          <Clock size={16} />
-          Iniciar turno
+          <div className="flex items-center justify-between px-5 py-4">
+            <div className="text-left">
+              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--amber)' }}>
+                Iniciar torn
+              </p>
+              <p className="text-xs text-gray-400 mt-0.5">El cuentakilómetros és opcional</p>
+            </div>
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ background: 'var(--amber)' }}
+            >
+              <span className="text-white text-xl leading-none">▶</span>
+            </div>
+          </div>
         </button>
 
         <OdometerModal
           isOpen={showStartKm}
+          title="Iniciar torn"
           defaultType="start"
-          onClose={handleStartKmClose}
+          onClose={() => setShowStartKm(false)}
           onSaved={handleStartKmSaved}
+          onSkip={handleStartKmSkip}
         />
       </>
     )
   }
 
+  // ── Active shift ──────────────────────────────────────────
   return (
     <>
       <Card className="bg-amber-50 border-amber-200">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs text-amber-600 font-semibold uppercase tracking-wide">Turno activo</p>
-            <p className="text-amber-900 font-bold text-lg">{formatDuration(shift.startAt)}</p>
-            <p className="text-xs text-amber-600">Inicio: {formatDateTime(shift.startAt)}</p>
+            <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--amber)' }}>
+              Torn actiu
+            </p>
+            <p className="text-2xl font-extrabold text-gray-900">{formatDuration(shift.startAt)}</p>
+            <p className="text-xs text-gray-400 mt-0.5">Inici: {formatDateTime(shift.startAt)}</p>
           </div>
           <button
-            onClick={handleEndClick}
-            className="px-4 py-2 bg-amber-500 text-white rounded-xl text-sm font-bold active:scale-95 transition-transform"
+            onClick={() => setShowEndKm(true)}
+            className="px-4 py-2 rounded-xl text-sm font-bold text-black active:scale-95 transition-transform"
+            style={{ background: 'var(--amber)' }}
           >
-            Finalizar
+            Finalitzar
           </button>
         </div>
+
+        {/* Inline km display */}
+        <div className="mt-3 pt-3 border-t border-amber-200 flex gap-3">
+          <button
+            onClick={() => openKmModal('start')}
+            className="flex-1 py-2 rounded-xl text-center active:scale-95 transition-transform"
+            style={{ background: 'rgba(0,0,0,0.05)' }}
+          >
+            <p className="text-xs text-gray-400">Km inici</p>
+            {kmData.start ? (
+              <p className="text-sm font-bold text-gray-800">{kmData.start.kmValue.toLocaleString('es-ES')}</p>
+            ) : (
+              <p className="text-sm text-gray-400">afegir →</p>
+            )}
+          </button>
+          <button
+            onClick={() => openKmModal('end')}
+            className="flex-1 py-2 rounded-xl text-center border-2 border-dashed border-amber-200 active:scale-95 transition-transform"
+          >
+            <p className="text-xs text-gray-400">Km fi</p>
+            {kmData.end ? (
+              <p className="text-sm font-bold text-gray-800">{kmData.end.kmValue.toLocaleString('es-ES')}</p>
+            ) : (
+              <p className="text-sm text-gray-400">afegir →</p>
+            )}
+          </button>
+        </div>
+        <p className="text-xs text-center mt-2 opacity-50 text-gray-400">El registre de km és opcional</p>
         <span className="sr-only">{tick}</span>
       </Card>
 
       <OdometerModal
         isOpen={showEndKm}
+        title="Finalitzar torn"
         defaultType="end"
-        onClose={handleEndKmClose}
+        onClose={() => setShowEndKm(false)}
         onSaved={handleEndKmSaved}
+        onSkip={handleEndKmSkip}
+      />
+
+      {/* km editor for active shift (no skip — just adds/updates reading) */}
+      <OdometerModal
+        isOpen={showAddKm}
+        defaultType={kmType}
+        onClose={() => setShowAddKm(false)}
+        onSaved={refresh}
       />
     </>
   )

@@ -1,12 +1,57 @@
 @import "tailwindcss";
 
+/* ── Design tokens ───────────────────────────────────────── */
 :root {
-  --background: #f9fafb;
-  --foreground: #111827;
+  --bg:       #F4F5F9;
+  --surface:  #FFFFFF;
+  --surface2: #ECEEF6;
+  --amber:    #D97706;
+  --indigo:   #4F46E5;
+  --emerald:  #059669;
+
+  /* legacy aliases */
+  --background: #F4F5F9;
+  --foreground:  #111827;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:       #0D0F14;
+    --surface:  #161A24;
+    --surface2: #1E2435;
+    --amber:    #F5A623;
+    --indigo:   #6366F1;
+    --emerald:  #10B981;
+    --background: #0D0F14;
+    --foreground:  #F0F2F8;
+  }
+}
+
+/* Manual overrides via data-theme attribute on <html> */
+[data-theme="dark"] {
+  --bg:       #0D0F14;
+  --surface:  #161A24;
+  --surface2: #1E2435;
+  --amber:    #F5A623;
+  --indigo:   #6366F1;
+  --emerald:  #10B981;
+  --background: #0D0F14;
+  --foreground:  #F0F2F8;
+}
+
+[data-theme="light"] {
+  --bg:       #F4F5F9;
+  --surface:  #FFFFFF;
+  --surface2: #ECEEF6;
+  --amber:    #D97706;
+  --indigo:   #4F46E5;
+  --emerald:  #059669;
+  --background: #F4F5F9;
+  --foreground:  #111827;
 }
 
 body {
-  background: var(--background);
+  background: var(--bg);
   color: var(--foreground);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;

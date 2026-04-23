@@ -55,7 +55,7 @@ export default function EstadisticasPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="bg-indigo-600 text-white px-5 pt-12 pb-4">
+      <div className="text-white px-5 pt-12 pb-4" style={{ background: 'var(--indigo)' }}>
         <h1 className="text-xl font-bold">{t('title')}</h1>
       </div>
 

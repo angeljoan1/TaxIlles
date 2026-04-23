@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { Plus, Car } from 'lucide-react'
 import { AddRideModal } from '@/components/rides/AddRideModal'
 import { RideCard } from '@/components/rides/RideCard'
-import { OdometerSection } from '@/components/odometer/OdometerSection'
 import { ShiftBanner } from '@/components/shift/ShiftBanner'
 import { Card } from '@/components/ui/Card'
 import { getRidesToday, deleteRide } from '@/db/queries/rides'
@@ -35,7 +34,7 @@ export default function HoyPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <div className="bg-indigo-600 text-white px-5 pt-12 pb-6">
+      <div className="text-white px-5 pt-12 pb-6" style={{ background: 'var(--indigo)' }}>
         <p className="text-indigo-200 text-sm capitalize">{formatDateSpanish(todayISO())}</p>
         <div className="flex items-end justify-between mt-2">
           <div>
@@ -55,7 +54,6 @@ export default function HoyPage() {
 
       <div className="flex flex-col gap-3 p-4">
         <ShiftBanner onUpdate={refresh} />
-        <OdometerSection />
 
         {/* Ride list */}
         {rides.length === 0 ? (

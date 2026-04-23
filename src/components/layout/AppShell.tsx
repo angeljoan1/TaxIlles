@@ -15,6 +15,16 @@ function SyncRunner() {
   return null
 }
 
+function ThemeInit() {
+  useEffect(() => {
+    const saved = localStorage.getItem('theme')
+    if (saved === 'dark' || saved === 'light') {
+      document.documentElement.setAttribute('data-theme', saved)
+    }
+  }, [])
+  return null
+}
+
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
   const { isUnlocked } = useCrypto()
@@ -68,6 +78,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <AuthProvider>
       <CryptoProvider>
         <I18nProvider>
+          <ThemeInit />
           <AuthGuard>{children}</AuthGuard>
         </I18nProvider>
       </CryptoProvider>

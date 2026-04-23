@@ -54,7 +54,7 @@ export default function ViajesPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="bg-indigo-600 text-white px-5 pt-12 pb-6">
+      <div className="text-white px-5 pt-12 pb-6" style={{ background: 'var(--indigo)' }}>
         <h1 className="text-xl font-bold">{t('title')}</h1>
         <p className="text-indigo-200 text-sm mt-1">{rides.length} {t('carreras')} · {formatEuros(totalCents)}</p>
       </div>
