@@ -6,7 +6,7 @@ interface NumberKeypadProps {
 }
 
 export function NumberKeypad({ value, onChange }: NumberKeypadProps) {
-  const displayValue = value === '' ? '0.00' : (parseInt(value, 10) / 100).toFixed(2)
+  const displayValue = value === '' ? '0,00' : (parseInt(value, 10) / 100).toFixed(2).replace('.', ',')
 
   const press = (key: string) => {
     if (key === '⌫') {
@@ -23,18 +23,28 @@ export function NumberKeypad({ value, onChange }: NumberKeypadProps) {
 
   return (
     <div className="px-4 pb-2">
-      <div className="text-center text-5xl font-bold text-gray-900 py-4 tracking-tight">
-        {displayValue} <span className="text-2xl text-gray-400">€</span>
+      <div
+        className="text-center py-5 tracking-tight rounded-2xl mb-2"
+        style={{ background: 'var(--surface2)' }}
+      >
+        <span className="text-5xl font-extrabold" style={{ color: 'var(--foreground)' }}>
+          {displayValue}
+        </span>
+        <span className="text-2xl font-bold ml-1" style={{ color: 'var(--foreground)', opacity: 0.4 }}>€</span>
       </div>
       <div className="grid grid-cols-3 gap-2">
         {keys.map(k => (
           <button
             key={k}
             onPointerDown={e => { e.preventDefault(); press(k) }}
-            className={`
-              py-4 rounded-2xl text-2xl font-semibold transition-all active:scale-95
-              ${k === '⌫' ? 'bg-red-50 text-red-600' : k === '.' ? 'bg-gray-100 text-gray-400 cursor-default' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}
-            `}
+            className="py-4 rounded-2xl text-2xl font-semibold transition-all active:scale-95"
+            style={
+              k === '⌫'
+                ? { background: 'rgba(239,68,68,0.1)', color: '#ef4444' }
+                : k === '.'
+                ? { background: 'var(--surface2)', color: 'var(--foreground)', opacity: 0.3, cursor: 'default' }
+                : { background: 'var(--surface2)', color: 'var(--foreground)' }
+            }
           >
             {k}
           </button>

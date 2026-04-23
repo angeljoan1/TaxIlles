@@ -1,4 +1,5 @@
 'use client'
+import { useState } from 'react'
 import { type Ride } from '@/db/schema'
 import { formatEurosShort } from '@/utils/currency'
 import { formatDateTime } from '@/utils/date'
@@ -9,31 +10,53 @@ interface RideCardProps {
 }
 
 export function RideCard({ ride, onDelete }: RideCardProps) {
+  const [confirming, setConfirming] = useState(false)
+
+  const handleDelete = () => {
+    if (confirming) {
+      onDelete?.(ride.id!)
+    } else {
+      setConfirming(true)
+      setTimeout(() => setConfirming(false), 3000)
+    }
+  }
+
   return (
-    <div className="flex items-center gap-3 py-3 px-4 bg-white border-b border-gray-50">
+    <div
+      className="flex items-center gap-3 py-3.5 px-4"
+      style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', background: 'var(--surface)' }}
+    >
       <div
-        className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+        className="w-2.5 h-2.5 rounded-full flex-shrink-0"
         style={{ backgroundColor: ride.destinationColor }}
-      >
-        {ride.destinationName.slice(0, 2).toUpperCase()}
-      </div>
+      />
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-gray-900 truncate">{ride.destinationName}</p>
-        <p className="text-xs text-gray-400">{formatDateTime(ride.riddenAt)}{ride.kmGps ? ` · ${ride.kmGps.toFixed(1)} km` : ''}</p>
+        <p className="font-semibold truncate" style={{ color: 'var(--foreground)', fontSize: 15 }}>
+          {ride.destinationName}
+        </p>
+        <p className="text-xs mt-0.5" style={{ color: 'var(--foreground)', opacity: 0.45 }}>
+          {formatDateTime(ride.riddenAt)}
+          {ride.kmGps ? ` · ${ride.kmGps.toFixed(1)} km` : ''}
+        </p>
       </div>
-      <div className="flex items-center gap-2">
-        <span className="text-emerald-600 font-bold text-lg">{formatEurosShort(ride.priceCents)}</span>
-        {onDelete && (
-          <button
-            onClick={() => {
-              if (confirm('¿Eliminar esta carrera?')) onDelete(ride.id!)
-            }}
-            className="w-7 h-7 rounded-full bg-red-50 text-red-400 text-xs hover:bg-red-100 flex items-center justify-center"
-          >
-            ✕
-          </button>
-        )}
-      </div>
+
+      <span className="text-base font-bold" style={{ color: 'var(--emerald)' }}>
+        {formatEurosShort(ride.priceCents)}
+      </span>
+
+      {onDelete && (
+        <button
+          onClick={handleDelete}
+          className="ml-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all active:scale-95"
+          style={
+            confirming
+              ? { background: 'rgba(239,68,68,0.12)', color: '#ef4444' }
+              : { background: 'var(--surface2)', color: 'var(--foreground)', opacity: 0.4 }
+          }
+        >
+          {confirming ? '¿Borrar?' : '✕'}
+        </button>
+      )}
     </div>
   )
 }

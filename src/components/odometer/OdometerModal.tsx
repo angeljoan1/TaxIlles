@@ -78,9 +78,14 @@ export function OdometerModal({ isOpen, defaultType, onClose, onSaved, onSkip, t
             <button
               key={t}
               onClick={() => setType(t)}
-              className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all ${type === t ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'}`}
+              className="flex-1 py-2 rounded-xl text-sm font-semibold transition-all active:scale-95"
+              style={
+                type === t
+                  ? { background: 'var(--indigo)', color: '#fff' }
+                  : { background: 'var(--surface2)', color: 'var(--foreground)', opacity: 0.6 }
+              }
             >
-              {t === 'start' ? 'Inicio' : 'Fin'}
+              {t === 'start' ? 'Inici' : 'Fi'}
             </button>
           ))}
         </div>
@@ -91,10 +96,11 @@ export function OdometerModal({ isOpen, defaultType, onClose, onSaved, onSkip, t
           <button
             onClick={() => fileRef.current?.click()}
             disabled={ocrLoading}
-            className="w-full py-3 bg-gray-100 rounded-xl text-gray-700 font-medium text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-60"
+            className="w-full py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-60"
+            style={{ background: 'var(--surface2)', color: 'var(--foreground)', opacity: ocrLoading ? 0.6 : 1 }}
           >
             <Camera size={18} />
-            {ocrLoading ? 'Leyendo imagen...' : 'Foto del odómetro (OCR)'}
+            {ocrLoading ? 'Llegint imatge...' : 'Foto del odòmetre (OCR)'}
           </button>
           {ocrPreview && (
             <div className="mt-2 rounded-xl overflow-hidden h-32">
@@ -111,8 +117,11 @@ export function OdometerModal({ isOpen, defaultType, onClose, onSaved, onSkip, t
 
         {/* Km input — editable always so user can correct OCR result */}
         <div>
-          <label className="text-xs text-gray-400 font-semibold uppercase tracking-wide">
-            Kilómetros {ocrPreview && kmInput ? '(corrige si es necesario)' : ''}
+          <label
+            className="text-xs font-bold uppercase tracking-widest"
+            style={{ color: 'var(--foreground)', opacity: 0.4 }}
+          >
+            Kilómetros {ocrPreview && kmInput ? '(corrige si cal)' : ''}
           </label>
           <input
             type="number"
@@ -120,7 +129,8 @@ export function OdometerModal({ isOpen, defaultType, onClose, onSaved, onSkip, t
             value={kmInput}
             onChange={e => setKmInput(e.target.value)}
             placeholder="143521"
-            className="mt-1 w-full py-3 px-4 bg-gray-100 rounded-xl text-2xl font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="mt-1 w-full py-3 px-4 rounded-xl text-2xl font-bold focus:outline-none"
+            style={{ background: 'var(--surface2)', color: 'var(--foreground)' }}
           />
         </div>
 
@@ -128,7 +138,8 @@ export function OdometerModal({ isOpen, defaultType, onClose, onSaved, onSkip, t
           {onSkip && (
             <button
               onClick={onSkip}
-              className="flex-1 py-4 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 active:scale-95 transition-transform"
+              className="flex-1 py-4 rounded-xl text-sm font-semibold active:scale-95 transition-transform"
+              style={{ background: 'var(--surface2)', color: 'var(--foreground)', opacity: 0.6 }}
             >
               Saltar
             </button>

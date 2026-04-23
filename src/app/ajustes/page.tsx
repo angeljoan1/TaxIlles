@@ -38,6 +38,8 @@ export default function AjustesPage() {
   const [locale, setLocaleState] = useState<'es' | 'ca'>('es')
   const [bioAvailable, setBioAvailable] = useState(false)
   const [importMsg, setImportMsg] = useState('')
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [confirmSignOut, setConfirmSignOut] = useState(false)
   const jsonInputRef = useRef<HTMLInputElement>(null)
   const csvInputRef = useRef<HTMLInputElement>(null)
 
@@ -70,8 +72,12 @@ export default function AjustesPage() {
   }
 
   const handleDeleteAll = async () => {
-    if (!confirm(t('confirmarBorrar'))) return
-    if (!confirm('¿Seguro? Se perderán todas las carreras, gastos y km.')) return
+    if (!confirmDelete) {
+      setConfirmDelete(true)
+      setTimeout(() => setConfirmDelete(false), 4000)
+      return
+    }
+    setConfirmDelete(false)
     await Promise.all([
       db.rides.clear(),
       db.odometer.clear(),
@@ -84,7 +90,12 @@ export default function AjustesPage() {
   }
 
   const handleSignOut = async () => {
-    if (!confirm('¿Cerrar sesión?')) return
+    if (!confirmSignOut) {
+      setConfirmSignOut(true)
+      setTimeout(() => setConfirmSignOut(false), 4000)
+      return
+    }
+    setConfirmSignOut(false)
     await signOut()
   }
 
@@ -117,13 +128,17 @@ export default function AjustesPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="text-white px-5 pt-12 pb-6" style={{ background: 'var(--indigo)' }}>
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold">{t('title')}</h1>
+    <div className="flex flex-col min-h-screen" style={{ background: 'var(--bg)' }}>
+      <div
+        className="px-5 pt-12 pb-5"
+        style={{ background: `linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%)` }}
+      >
+        <div className="flex items-end justify-between">
+          <h1 className="text-3xl font-extrabold" style={{ color: 'var(--foreground)' }}>{t('title')}</h1>
           <button
             onClick={toggleTheme}
-            className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center active:scale-95 transition-transform"
+            className="w-10 h-10 rounded-full flex items-center justify-center active:scale-95 transition-transform mb-1"
+            style={{ background: 'var(--surface2)', color: 'var(--foreground)' }}
             aria-label="Toggle theme"
           >
             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
@@ -131,7 +146,7 @@ export default function AjustesPage() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 p-4">
+      <div className="flex flex-col gap-4 px-4 pb-6">
 
         {/* Destinations */}
         <Card>
@@ -299,19 +314,29 @@ export default function AjustesPage() {
         {/* Sign out */}
         <button
           onClick={handleSignOut}
-          className="flex items-center justify-center gap-2 w-full py-3 text-gray-500 text-sm font-medium"
+          className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl text-sm font-semibold transition-all active:scale-95"
+          style={
+            confirmSignOut
+              ? { background: 'rgba(239,68,68,0.1)', color: '#ef4444' }
+              : { background: 'var(--surface)', color: 'var(--foreground)', opacity: 0.6, border: '1px solid rgba(0,0,0,0.06)' }
+          }
         >
           <LogOut size={16} />
-          {t('cerrarSesion')}
+          {confirmSignOut ? '¿Seguro? Pulsa otra vez' : t('cerrarSesion')}
         </button>
 
         {/* Danger */}
         <button
           onClick={handleDeleteAll}
-          className="flex items-center justify-center gap-2 w-full py-3 text-red-500 text-sm font-medium"
+          className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl text-sm font-semibold transition-all active:scale-95"
+          style={
+            confirmDelete
+              ? { background: 'rgba(239,68,68,0.15)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)' }
+              : { background: 'rgba(239,68,68,0.08)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.15)' }
+          }
         >
           <Trash2 size={16} />
-          {t('borrarDatos')}
+          {confirmDelete ? '¿Seguro? Pulsa de nuevo para confirmar' : t('borrarDatos')}
         </button>
       </div>
 
@@ -341,14 +366,12 @@ function DestinationModal({ isOpen, existing, onClose, onSaved }: {
 
   const handleArchive = async () => {
     if (!existing?.id) return
-    if (!confirm(`¿Archivar "${existing.name}"?`)) return
     await toggleDestination(existing.id, false)
     onSaved(); onClose()
   }
 
   const handleDelete = async () => {
     if (!existing?.id) return
-    if (!confirm(`¿Eliminar permanentemente "${existing.name}"? No se puede deshacer.`)) return
     await deleteDestination(existing.id)
     onSaved(); onClose()
   }
@@ -357,9 +380,10 @@ function DestinationModal({ isOpen, existing, onClose, onSaved }: {
     <Modal isOpen={isOpen} onClose={onClose} title={existing ? 'Editar destino' : 'Nuevo destino'}>
       <div className="flex flex-col gap-4 p-4">
         <div>
-          <label className="text-xs text-gray-400 font-semibold uppercase tracking-wide">Nombre</label>
+          <label className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--foreground)', opacity: 0.4 }}>Nombre</label>
           <input autoFocus value={name} onChange={e => setName(e.target.value)} placeholder="Aeropuerto, Centro..."
-            className="mt-1 w-full py-3 px-4 bg-gray-100 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            className="mt-1 w-full py-3 px-4 rounded-xl focus:outline-none"
+            style={{ background: 'var(--surface2)', color: 'var(--foreground)' }} />
         </div>
         <div>
           <label className="text-xs text-gray-400 font-semibold uppercase tracking-wide">Color</label>
