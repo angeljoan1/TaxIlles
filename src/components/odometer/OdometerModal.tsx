@@ -11,9 +11,11 @@ interface OdometerModalProps {
   defaultType: 'start' | 'end'
   onClose: () => void
   onSaved: () => void
+  onSkip?: () => void
+  title?: string
 }
 
-export function OdometerModal({ isOpen, defaultType, onClose, onSaved }: OdometerModalProps) {
+export function OdometerModal({ isOpen, defaultType, onClose, onSaved, onSkip, title }: OdometerModalProps) {
   const [type, setType] = useState<'start' | 'end'>(defaultType)
   const [kmInput, setKmInput] = useState('')
   const [ocrLoading, setOcrLoading] = useState(false)
@@ -68,7 +70,7 @@ export function OdometerModal({ isOpen, defaultType, onClose, onSaved }: Odomete
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Registrar km">
+    <Modal isOpen={isOpen} onClose={onClose} title={title ?? 'Registrar km'}>
       <div className="flex flex-col gap-4 p-4">
         {/* Type selector: only Inicio / Fin */}
         <div className="flex gap-2">
@@ -122,14 +124,24 @@ export function OdometerModal({ isOpen, defaultType, onClose, onSaved }: Odomete
           />
         </div>
 
-        <Button
-          onClick={handleSave}
-          disabled={!kmInput || parseInt(kmInput) <= 0}
-          className="w-full"
-          size="lg"
-        >
-          Guardar lectura
-        </Button>
+        <div className={onSkip ? 'flex gap-3' : ''}>
+          {onSkip && (
+            <button
+              onClick={onSkip}
+              className="flex-1 py-4 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 active:scale-95 transition-transform"
+            >
+              Saltar
+            </button>
+          )}
+          <Button
+            onClick={handleSave}
+            disabled={!kmInput || parseInt(kmInput) <= 0}
+            className={onSkip ? 'flex-[2]' : 'w-full'}
+            size="lg"
+          >
+            Guardar lectura
+          </Button>
+        </div>
       </div>
     </Modal>
   )

@@ -1,10 +1,13 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist } from 'next/font/google'
+import { DM_Sans } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { AppShell } from '@/components/layout/AppShell'
 
-const geist = Geist({ subsets: ['latin'] })
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+})
 
 export const metadata: Metadata = {
   title: 'TaxIlles',
@@ -32,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
-      <body className={`${geist.className} bg-gray-50 min-h-screen`}>
+      <body className={`${dmSans.className} min-h-screen`} style={{ background: 'var(--bg)' }}>
         <AppShell>{children}</AppShell>
         <Script id="sw-register" strategy="afterInteractive">{`
           if ('serviceWorker' in navigator) {

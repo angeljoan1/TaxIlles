@@ -18,7 +18,7 @@ export function BottomNav() {
   const t = useTranslations('nav')
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 border-t border-gray-200 z-40 safe-area-bottom" style={{ background: 'var(--surface)' }}>
       <div className="max-w-lg mx-auto flex">
         {TABS.map(({ href, icon: Icon, key }) => {
           const isActive = pathname === href || pathname.startsWith(href)
@@ -28,12 +28,13 @@ export function BottomNav() {
               href={href}
               className={clsx(
                 'flex-1 flex flex-col items-center py-2 pt-3 text-xs transition-colors',
-                isActive ? 'text-indigo-600' : 'text-gray-400'
+                !isActive && 'text-gray-400'
               )}
+              style={isActive ? { color: 'var(--indigo)' } : {}}
             >
               <Icon size={22} className="mb-0.5" />
               <span className={clsx('font-medium', isActive && 'font-bold')}>{t(key)}</span>
-              {isActive && <span className="mt-1 w-1 h-1 rounded-full bg-indigo-600" />}
+              {isActive && <span className="mt-1 w-1 h-1 rounded-full" style={{ background: 'var(--indigo)' }} />}
             </Link>
           )
         })}
