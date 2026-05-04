@@ -9,9 +9,10 @@ import { formatDuration, formatDateTime } from '@/utils/date'
 
 interface ShiftBannerProps {
   onUpdate?: () => void
+  onShiftChange?: (active: boolean) => void
 }
 
-export function ShiftBanner({ onUpdate }: ShiftBannerProps) {
+export function ShiftBanner({ onUpdate, onShiftChange }: ShiftBannerProps) {
   const [shift, setShift] = useState<Shift | null>(null)
   const [tick, setTick] = useState(0)
   const [showStartKm, setShowStartKm] = useState(false)
@@ -23,8 +24,9 @@ export function ShiftBanner({ onUpdate }: ShiftBannerProps) {
   const refresh = useCallback(async () => {
     const [active, km] = await Promise.all([getActiveShift(), getTodayOdometer()])
     setShift(active ?? null)
+    onShiftChange?.(!!active)
     setKmData(km)
-  }, [])
+  }, [onShiftChange])
 
   useEffect(() => { refresh() }, [refresh])
 
@@ -81,8 +83,8 @@ export function ShiftBanner({ onUpdate }: ShiftBannerProps) {
       <>
         <button
           onClick={() => setShowStartKm(true)}
-          className="w-full rounded-2xl border border-amber-200 active:scale-95 transition-transform"
-          style={{ background: 'rgba(245,166,35,0.08)' }}
+          className="w-full rounded-2xl active:scale-95 transition-transform"
+          style={{ background: 'var(--amber-dim)', border: '1.5px solid color-mix(in srgb, var(--amber) 33%, transparent)' }}
         >
           <div className="flex items-center justify-between px-5 py-4">
             <div className="text-left">
@@ -115,18 +117,24 @@ export function ShiftBanner({ onUpdate }: ShiftBannerProps) {
   // ── Active shift ──────────────────────────────────────────
   return (
     <>
-      <Card className="bg-amber-50 border-amber-200">
+      <div
+        className="rounded-2xl p-4"
+        style={{
+          background: 'var(--amber-dim)',
+          border: '1.5px solid color-mix(in srgb, var(--amber) 33%, transparent)',
+        }}
+      >
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--amber)' }}>
               Torn actiu
             </p>
-            <p className="text-2xl font-extrabold text-gray-900">{formatDuration(shift.startAt)}</p>
-            <p className="text-xs text-gray-400 mt-0.5">Inici: {formatDateTime(shift.startAt)}</p>
+            <p className="text-2xl font-extrabold mt-0.5" style={{ color: 'var(--text)' }}>{formatDuration(shift.startAt)}</p>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Inici: {formatDateTime(shift.startAt)}</p>
           </div>
           <button
             onClick={() => setShowEndKm(true)}
-            className="px-4 py-2 rounded-xl text-sm font-bold text-black active:scale-95 transition-transform"
+            className="px-4 py-2.5 rounded-xl text-sm font-bold text-black active:scale-95 transition-transform"
             style={{ background: 'var(--amber)' }}
           >
             Finalitzar
@@ -134,34 +142,35 @@ export function ShiftBanner({ onUpdate }: ShiftBannerProps) {
         </div>
 
         {/* Inline km display */}
-        <div className="mt-3 pt-3 border-t border-amber-200 flex gap-3">
+        <div className="mt-3 pt-3 flex gap-3" style={{ borderTop: '1px solid color-mix(in srgb, var(--amber) 25%, transparent)' }}>
           <button
             onClick={() => openKmModal('start')}
             className="flex-1 py-2 rounded-xl text-center active:scale-95 transition-transform"
-            style={{ background: 'rgba(0,0,0,0.05)' }}
+            style={{ background: 'rgba(0,0,0,0.08)' }}
           >
-            <p className="text-xs text-gray-400">Km inici</p>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Km inici</p>
             {kmData.start ? (
-              <p className="text-sm font-bold text-gray-800">{kmData.start.kmValue.toLocaleString('es-ES')}</p>
+              <p className="text-sm font-bold mt-0.5" style={{ color: 'var(--text)' }}>{kmData.start.kmValue.toLocaleString('es-ES')}</p>
             ) : (
-              <p className="text-sm text-gray-400">afegir →</p>
+              <p className="text-sm" style={{ color: 'var(--text-dim)' }}>afegir →</p>
             )}
           </button>
           <button
             onClick={() => openKmModal('end')}
-            className="flex-1 py-2 rounded-xl text-center border-2 border-dashed border-amber-200 active:scale-95 transition-transform"
+            className="flex-1 py-2 rounded-xl text-center active:scale-95 transition-transform"
+            style={{ background: 'rgba(0,0,0,0.04)', border: '1.5px dashed var(--border-mid)' }}
           >
-            <p className="text-xs text-gray-400">Km fi</p>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Km fi</p>
             {kmData.end ? (
-              <p className="text-sm font-bold text-gray-800">{kmData.end.kmValue.toLocaleString('es-ES')}</p>
+              <p className="text-sm font-bold mt-0.5" style={{ color: 'var(--text)' }}>{kmData.end.kmValue.toLocaleString('es-ES')}</p>
             ) : (
-              <p className="text-sm text-gray-400">afegir →</p>
+              <p className="text-sm" style={{ color: 'var(--text-dim)' }}>afegir →</p>
             )}
           </button>
         </div>
-        <p className="text-xs text-center mt-2 opacity-50 text-gray-400">El registre de km és opcional</p>
+        <p className="text-xs text-center mt-2" style={{ color: 'var(--text-muted)', opacity: 0.6 }}>El registre de km és opcional</p>
         <span className="sr-only">{tick}</span>
-      </Card>
+      </div>
 
       <OdometerModal
         isOpen={showEndKm}

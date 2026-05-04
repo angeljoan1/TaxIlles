@@ -1,58 +1,103 @@
 @import "tailwindcss";
 
-/* ── Design tokens ───────────────────────────────────────── */
+/* ── Design tokens — Light (default) ────────────────────── */
 :root {
-  --bg:       #F4F5F9;
-  --surface:  #FFFFFF;
-  --surface2: #ECEEF6;
-  --amber:    #D97706;
-  --indigo:   #4F46E5;
-  --emerald:  #059669;
+  --bg:          #F4F5F9;
+  --surface:     #FFFFFF;
+  --surface2:    #ECEEF6;
+  --surface3:    #E2E4EE;
+  --border:      rgba(0,0,0,0.07);
+  --border-mid:  rgba(0,0,0,0.12);
+  --amber:       #D97706;
+  --amber-dim:   rgba(217,119,6,0.09);
+  --indigo:      #4F46E5;
+  --indigo-dim:  rgba(79,70,229,0.10);
+  --emerald:     #059669;
+  --emerald-dim: rgba(5,150,105,0.10);
+  --red:         #DC2626;
+  --red-dim:     rgba(220,38,38,0.07);
+  --text:        #111827;
+  --text-muted:  #6B7280;
+  --text-dim:    #C4C9D8;
 
   /* legacy aliases */
-  --background: #F4F5F9;
+  --background:  #F4F5F9;
   --foreground:  #111827;
 }
 
+/* ── Design tokens — Dark ────────────────────────────────── */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg:       #0D0F14;
-    --surface:  #161A24;
-    --surface2: #1E2435;
-    --amber:    #F5A623;
-    --indigo:   #6366F1;
-    --emerald:  #10B981;
-    --background: #0D0F14;
+    --bg:          #0D0F14;
+    --surface:     #161A24;
+    --surface2:    #1E2435;
+    --surface3:    #252C40;
+    --border:      rgba(255,255,255,0.07);
+    --border-mid:  rgba(255,255,255,0.11);
+    --amber:       #F5A623;
+    --amber-dim:   rgba(245,166,35,0.13);
+    --indigo:      #6366F1;
+    --indigo-dim:  rgba(99,102,241,0.15);
+    --emerald:     #10B981;
+    --emerald-dim: rgba(16,185,129,0.13);
+    --red:         #F87171;
+    --red-dim:     rgba(248,113,113,0.12);
+    --text:        #F0F2F8;
+    --text-muted:  #7B8499;
+    --text-dim:    #3E4560;
+    --background:  #0D0F14;
     --foreground:  #F0F2F8;
   }
 }
 
-/* Manual overrides via data-theme attribute on <html> */
-[data-theme="dark"] {
-  --bg:       #0D0F14;
-  --surface:  #161A24;
-  --surface2: #1E2435;
-  --amber:    #F5A623;
-  --indigo:   #6366F1;
-  --emerald:  #10B981;
-  --background: #0D0F14;
-  --foreground:  #F0F2F8;
+/* ── Manual overrides via data-theme on <html> ───────────── */
+[data-theme="light"] {
+  --bg:          #F4F5F9;
+  --surface:     #FFFFFF;
+  --surface2:    #ECEEF6;
+  --surface3:    #E2E4EE;
+  --border:      rgba(0,0,0,0.07);
+  --border-mid:  rgba(0,0,0,0.12);
+  --amber:       #D97706;
+  --amber-dim:   rgba(217,119,6,0.09);
+  --indigo:      #4F46E5;
+  --indigo-dim:  rgba(79,70,229,0.10);
+  --emerald:     #059669;
+  --emerald-dim: rgba(5,150,105,0.10);
+  --red:         #DC2626;
+  --red-dim:     rgba(220,38,38,0.07);
+  --text:        #111827;
+  --text-muted:  #6B7280;
+  --text-dim:    #C4C9D8;
+  --background:  #F4F5F9;
+  --foreground:  #111827;
 }
 
-[data-theme="light"] {
-  --bg:       #F4F5F9;
-  --surface:  #FFFFFF;
-  --surface2: #ECEEF6;
-  --amber:    #D97706;
-  --indigo:   #4F46E5;
-  --emerald:  #059669;
-  --background: #F4F5F9;
-  --foreground:  #111827;
+[data-theme="dark"] {
+  --bg:          #0D0F14;
+  --surface:     #161A24;
+  --surface2:    #1E2435;
+  --surface3:    #252C40;
+  --border:      rgba(255,255,255,0.07);
+  --border-mid:  rgba(255,255,255,0.11);
+  --amber:       #F5A623;
+  --amber-dim:   rgba(245,166,35,0.13);
+  --indigo:      #6366F1;
+  --indigo-dim:  rgba(99,102,241,0.15);
+  --emerald:     #10B981;
+  --emerald-dim: rgba(16,185,129,0.13);
+  --red:         #F87171;
+  --red-dim:     rgba(248,113,113,0.12);
+  --text:        #F0F2F8;
+  --text-muted:  #7B8499;
+  --text-dim:    #3E4560;
+  --background:  #0D0F14;
+  --foreground:  #F0F2F8;
 }
 
 body {
   background: var(--bg);
-  color: var(--foreground);
+  color: var(--text);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
 }

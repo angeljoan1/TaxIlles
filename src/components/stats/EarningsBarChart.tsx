@@ -24,7 +24,7 @@ export function EarningsBarChart({ data }: Props) {
         />
         <Bar dataKey="euros" radius={[6, 6, 0, 0]}>
           {data.map((entry, index) => (
-            <Cell key={index} fill={entry.euros === maxVal ? '#6366f1' : '#c7d2fe'} />
+            <Cell key={index} fill={entry.euros === maxVal ? 'var(--amber)' : 'var(--surface3)'} />
           ))}
         </Bar>
       </BarChart>

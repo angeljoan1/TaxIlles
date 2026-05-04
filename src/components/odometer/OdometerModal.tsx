@@ -134,12 +134,12 @@ export function OdometerModal({ isOpen, defaultType, onClose, onSaved, onSkip, t
           />
         </div>
 
-        <div className={onSkip ? 'flex gap-3' : ''}>
+        <div className={onSkip ? 'flex gap-2' : ''}>
           {onSkip && (
             <button
               onClick={onSkip}
               className="flex-1 py-4 rounded-xl text-sm font-semibold active:scale-95 transition-transform"
-              style={{ background: 'var(--surface2)', color: 'var(--foreground)', opacity: 0.6 }}
+              style={{ background: 'var(--surface2)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}
             >
               Saltar
             </button>
@@ -153,6 +153,11 @@ export function OdometerModal({ isOpen, defaultType, onClose, onSaved, onSkip, t
             Guardar lectura
           </Button>
         </div>
+        {onSkip && (
+          <p className="text-xs text-center" style={{ color: 'var(--text-muted)', opacity: 0.6 }}>
+            Pots saltar si no vols registrar els km
+          </p>
+        )}
       </div>
     </Modal>
   )

@@ -28,12 +28,12 @@ export function Modal({ isOpen, onClose, title, children, fullscreen }: ModalPro
         {/* Drag handle */}
         {!fullscreen && (
           <div className="flex justify-center pt-3 pb-1">
-            <div className="w-9 h-1 rounded-full bg-gray-200" />
+            <div className="w-9 h-1 rounded-full" style={{ background: 'var(--border-mid)' }} />
           </div>
         )}
         <div
           className="flex items-center justify-between px-5 pt-3 pb-3"
-          style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}
+          style={{ borderBottom: '1px solid var(--border)' }}
         >
           <h2 className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>{title}</h2>
           <button
